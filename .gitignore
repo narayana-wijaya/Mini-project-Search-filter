@@ -1,0 +1,6 @@
+.DS_Store
+Pods
+xcuserdata
+Podfile.lock
+Carthage/Checkouts
+Carthage/Build
