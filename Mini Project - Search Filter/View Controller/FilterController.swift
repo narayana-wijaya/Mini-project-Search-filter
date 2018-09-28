@@ -52,8 +52,8 @@ class FilterController: BaseFilterController {
     func setupInitialValue() {
         guard let request = requestModel else { return }
         
-        minimumPriceTextField.text = "\(request.pmin ?? 0)"
-        maximumPriceTextField.text = "\(request.pmax ?? maxPrice)"
+        minimumPriceTextField.text = "Rp\(request.pmin?.formattedWithSeparator ?? "0")"
+        maximumPriceTextField.text = "Rp\(request.pmax?.formattedWithSeparator ?? maxPrice.formattedWithSeparator)"
         
         doubleSlider.lowerValueStepIndex = (request.pmin ?? 0)/step
         doubleSlider.upperValueStepIndex = (request.pmax ?? maxPrice)/step
@@ -167,8 +167,8 @@ extension FilterController: DoubleSliderValueChangedDelegate {
     func valueChanged(for doubleSlider: DoubleSlider) {
         let minPrice = step*doubleSlider.lowerValueStepIndex
         let maxPrice = step*doubleSlider.upperValueStepIndex
-        minimumPriceTextField.text = "\(minPrice)"
-        maximumPriceTextField.text = "\(maxPrice)"
+        minimumPriceTextField.text = "Rp\(minPrice.formattedWithSeparator)"
+        maximumPriceTextField.text = "Rp\(maxPrice.formattedWithSeparator)"
         
         requestModel?.pmax = maxPrice
         requestModel?.pmin = minPrice
@@ -176,31 +176,35 @@ extension FilterController: DoubleSliderValueChangedDelegate {
 }
 
 extension FilterController: UITextFieldDelegate {
+    func textFieldDidBeginEditing(_ textField: UITextField) {
+        guard let request = requestModel else { return }
+        if textField == minimumPriceTextField {
+            textField.text = "\(request.pmin ?? 0)"
+        }
+        if textField == maximumPriceTextField {
+            textField.text = "\(request.pmax ?? maxPrice)"
+        }
+    }
+    
     func textFieldDidEndEditing(_ textField: UITextField) {
         let value = textField.text.toInt()
         if textField == minimumPriceTextField {
-            guard value <= maximumPriceTextField.text.toInt() else {
-                textField.text = "\(requestModel?.pmin ?? 0)"
-                let alert = UIAlertController(title: "", message: "minimum price should not exceed maximum price", preferredStyle: .alert)
-                alert.addAction(UIAlertAction(title: "Close", style: .default, handler: { (action) in
-                    alert.dismiss(animated: true, completion: nil)
-                }))
-                self.present(alert, animated: true, completion: nil)
+            guard let request = requestModel, let max = request.pmax, value <= max else {
+                textField.text = "Rp\(requestModel?.pmin?.formattedWithSeparator ?? "0")"
+                present(alert: "minimum price should not exceed maximum price")
                 return
             }
+            textField.text = "Rp\(value.formattedWithSeparator)"
             requestModel?.pmin = value
             doubleSlider.lowerValueStepIndex = value/step
         }
         if textField == maximumPriceTextField {
-            guard value >= minimumPriceTextField.text.toInt() else {
-                textField.text = "\(requestModel?.pmax ?? maxPrice)"
-                let alert = UIAlertController(title: "", message: "maximum price should not less than minimum price", preferredStyle: .alert)
-                alert.addAction(UIAlertAction(title: "Close", style: .default, handler: { (action) in
-                    alert.dismiss(animated: true, completion: nil)
-                }))
-                self.present(alert, animated: true, completion: nil)
+            guard let request = requestModel, let min = request.pmin, value >= min else {
+                textField.text = "Rp\(requestModel?.pmax?.formattedWithSeparator ?? maxPrice.formattedWithSeparator)"
+                present(alert: "maximum price should not less than minimum price")
                 return
             }
+            textField.text = "Rp\(value.formattedWithSeparator)"
             requestModel?.pmax = value
             doubleSlider.upperValueStepIndex = value/step
         }
@@ -209,6 +213,14 @@ extension FilterController: UITextFieldDelegate {
     func textFieldShouldReturn(_ textField: UITextField) -> Bool {
         textField.resignFirstResponder()
         return true
+    }
+    
+    func present(alert message: String) {
+        let alert = UIAlertController(title: "", message: message, preferredStyle: .alert)
+        alert.addAction(UIAlertAction(title: "Close", style: .default, handler: { (action) in
+            alert.dismiss(animated: true, completion: nil)
+        }))
+        self.present(alert, animated: true, completion: nil)
     }
 }
 

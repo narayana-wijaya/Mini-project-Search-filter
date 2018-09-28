@@ -37,6 +37,7 @@ class SearchController: UIViewController {
     func loadData(_ model: RequestModel?) {
         if let model = model, model.start == 0 {
             self.items.removeAll()
+            self.collectionView.reloadData()
         }
         provider.getData(params: model.toKeyVal() ?? [:], { (newItems) in
             guard newItems.count > 0 else { return }
