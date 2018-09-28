@@ -126,6 +126,7 @@
 		39099B14215ABA7E002E6E25 /* Mini Project - Search Filter */ = {
 			isa = PBXGroup;
 			children = (
+				39099B55215DC395002E6E25 /* Extension */,
 				39099B48215D938C002E6E25 /* Supporting Files */,
 				39099B37215AC0D3002E6E25 /* Model */,
 				39099B36215AC0CB002E6E25 /* View */,
@@ -133,7 +134,6 @@
 				39099B19215ABA7E002E6E25 /* Main.storyboard */,
 				39099B1E215ABA83002E6E25 /* LaunchScreen.storyboard */,
 				39099B42215BE3D2002E6E25 /* NetworkDataProvider.swift */,
-				39099B44215D28FA002E6E25 /* Extension.swift */,
 			);
 			path = "Mini Project - Search Filter";
 			sourceTree = "<group>";
@@ -189,6 +189,14 @@
 				39099B21215ABA83002E6E25 /* Info.plist */,
 			);
 			path = "Supporting Files";
+			sourceTree = "<group>";
+		};
+		39099B55215DC395002E6E25 /* Extension */ = {
+			isa = PBXGroup;
+			children = (
+				39099B44215D28FA002E6E25 /* Extension.swift */,
+			);
+			path = Extension;
 			sourceTree = "<group>";
 		};
 		78ADC81B102CB65CCBA8E24A /* Pods */ = {
