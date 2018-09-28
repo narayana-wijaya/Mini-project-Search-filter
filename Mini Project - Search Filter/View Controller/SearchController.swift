@@ -39,12 +39,8 @@ class SearchController: UIViewController {
             self.items.removeAll()
             self.collectionView.reloadData()
         }
-        print(model?.toKeyVal() ?? [:])
         provider.getData(params: model.toKeyVal() ?? [:], { (newItems) in
             guard newItems.count > 0 else { return }
-            for item in newItems {
-                print(item.badges ?? [])
-            }
             self.items.append(contentsOf: newItems)
             self.collectionView.reloadData()
         }) { (errorMsg) in
