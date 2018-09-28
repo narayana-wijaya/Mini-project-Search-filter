@@ -22,11 +22,6 @@ class SearchController: UIViewController {
     
     var requestModel: RequestModel?
     
-//    override func viewDidAppear(_ animated: Bool) {
-//        super.viewDidAppear(animated)
-//
-//    }
-    
     override func viewDidLoad() {
         super.viewDidLoad()
         requestModel = RequestModel(minPrice: 0, maxPrice: 100000000, wholesale: false, official: false, fshop: 1, start: 0)

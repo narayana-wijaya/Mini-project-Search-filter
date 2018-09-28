@@ -107,6 +107,10 @@ class FilterController: BaseFilterController {
         }
     }
 
+    @IBAction func wholeShaleDidSwitch(_ sender: UISwitch) {
+        requestModel?.wholesale = sender.isOn
+    }
+    
     @IBAction func shopTypeSelectDidTapped(_ sender: UIButton) {
         let vc = self.storyboard?.instantiateViewController(withIdentifier: "ShopTypeController") as! ShopTypeController
         vc.requestModel = requestModel
