@@ -9,7 +9,7 @@
 import UIKit
 
 protocol ShopTypeCollectionViewCellDelegate: class {
-    func deleteButtonDidTapped(_ cell: UICollectionViewCell)
+    func deleteButtonDidTapped(title: String)
 }
 
 class ShopTypeCollectionViewCell: UICollectionViewCell {
@@ -19,6 +19,7 @@ class ShopTypeCollectionViewCell: UICollectionViewCell {
     @IBOutlet weak var deleteButton: UIButton!
     
     weak var delegate: ShopTypeCollectionViewCellDelegate?
+    var index: Int!
     
     override func awakeFromNib() {
         super.awakeFromNib()
@@ -34,7 +35,7 @@ class ShopTypeCollectionViewCell: UICollectionViewCell {
 
     @IBAction func deleteButtonDidTapped(_ sender: UIButton) {
         if let delegate = delegate {
-            delegate.deleteButtonDidTapped(self)
+            delegate.deleteButtonDidTapped(title: nameLabel.text ?? "")
         }
     }
 }

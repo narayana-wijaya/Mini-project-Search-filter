@@ -9,6 +9,10 @@
 import UIKit
 import DoubleSlider
 
+protocol FilterDelegate: class {
+    func didUpdate(requestModel: RequestModel)
+}
+
 class FilterController: BaseFilterController {
 
     @IBOutlet weak var minimumPriceTextField: UITextField!
@@ -22,8 +26,11 @@ class FilterController: BaseFilterController {
     private let maxPrice: Int = 100000000
     private let step: Int = 10000
     
+    weak var delegate: FilterDelegate?
+    
     private let cellIdentifier = "ShopTypeCell"
     var requestModel: RequestModel?
+    var badges: [String] = []
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -39,6 +46,33 @@ class FilterController: BaseFilterController {
         }
         
         setupDoubleSlider()
+        setupInitialValue()
+    }
+    
+    func setupInitialValue() {
+        guard let request = requestModel else { return }
+        
+        minimumPriceTextField.text = "\(request.pmin ?? 0)"
+        maximumPriceTextField.text = "\(request.pmax ?? maxPrice)"
+        
+        doubleSlider.lowerValueStepIndex = (request.pmin ?? 0)/step
+        doubleSlider.upperValueStepIndex = (request.pmax ?? maxPrice)/step
+        
+        wholesaleSwitch.isOn = request.wholesale ?? false
+        
+        setupShopType()
+    }
+    
+    func setupShopType() {
+        guard let request = requestModel else { return }
+        badges.removeAll()
+        if request.fshop == 2 {
+            badges.append(BadgeType.goldMerchant.rawValue)
+        }
+        if request.official! {
+            badges.append(BadgeType.officialStore.rawValue)
+        }
+        shopTypeCollectionView.reloadData()
     }
     
     func setupDoubleSlider() {
@@ -54,52 +88,124 @@ class FilterController: BaseFilterController {
         
         doubleSlider = DoubleSlider(frame: frame)
         doubleSlider.translatesAutoresizingMaskIntoConstraints = false
-        doubleSlider.trackHighlightTintColor = .green
+        doubleSlider.trackHighlightTintColor = .tokopediaGreen
         doubleSlider.numberOfSteps = (maxPrice/step)+1
         doubleSlider.smoothStepping = true
         doubleSlider.labelsAreHidden = true
         
         doubleSlider.lowerValueStepIndex = 0
         doubleSlider.upperValueStepIndex = maxPrice/step
-        
-        doubleSlider.addTarget(self, action: #selector(sliderChange(_:)), for: .valueChanged)
-        doubleSlider.editingDidEndDelegate = self
+
+        doubleSlider.valueChangedDelegate = self
         
         sliderView.addSubview(doubleSlider)
     }
     
-    @objc func sliderChange(_ sender: DoubleSlider) {
-        
-    }
-    
     override func resetButtonTapped() {
-        
+        if let request = requestModel {
+            request.reset(max: maxPrice)
+        }
     }
 
     @IBAction func shopTypeSelectDidTapped(_ sender: UIButton) {
         let vc = self.storyboard?.instantiateViewController(withIdentifier: "ShopTypeController") as! ShopTypeController
         vc.requestModel = requestModel
+        vc.delegate = self
         self.navigationController?.pushViewController(vc, animated: true)
     }
     
+    @IBAction func applyFilterDidTapped(_ sender: UIButton) {
+        if let delegate = delegate, let request = requestModel {
+            request.start = 0
+            delegate.didUpdate(requestModel: request)
+            self.navigationController?.dismiss(animated: true, completion: nil)
+        }
+    }
+}
+
+extension FilterController: FilterDelegate {
+    func didUpdate(requestModel: RequestModel) {
+        self.requestModel = requestModel
+        setupShopType()
+    }
 }
 
 extension FilterController: UICollectionViewDataSource {
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        return 2
+        return badges.count
     }
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: cellIdentifier, for: indexPath) as! ShopTypeCollectionViewCell
-        cell.nameLabel.text = "Gold Merchant"
+        cell.nameLabel.text = badges[indexPath.row]
+        cell.index = indexPath.row
+        cell.delegate = self
         return cell
     }
 }
 
-extension FilterController: DoubleSliderEditingDidEndDelegate {
-    func editingDidEnd(for doubleSlider: DoubleSlider) {
-        minimumPriceTextField.text = "\(step*doubleSlider.lowerValueStepIndex)"
-        maximumPriceTextField.text = "\(step*doubleSlider.upperValueStepIndex)"
-        print("Lower Step Index: \(doubleSlider.lowerValueStepIndex) Upper Step Index: \(doubleSlider.upperValueStepIndex)")
+extension FilterController: ShopTypeCollectionViewCellDelegate {
+    func deleteButtonDidTapped(title: String) {
+        if let index = badges.firstIndex(of: title) {
+            badges.remove(at: index)
+        }
+        if title == BadgeType.goldMerchant.rawValue {
+            requestModel?.fshop = 1
+        }
+        if title == BadgeType.officialStore.rawValue {
+            requestModel?.official = false
+        }
+        shopTypeCollectionView.reloadData()
     }
 }
+
+extension FilterController: DoubleSliderValueChangedDelegate {
+    func valueChanged(for doubleSlider: DoubleSlider) {
+        let minPrice = step*doubleSlider.lowerValueStepIndex
+        let maxPrice = step*doubleSlider.upperValueStepIndex
+        minimumPriceTextField.text = "\(minPrice)"
+        maximumPriceTextField.text = "\(maxPrice)"
+        
+        requestModel?.pmax = maxPrice
+        requestModel?.pmin = minPrice
+    }
+}
+
+extension FilterController: UITextFieldDelegate {
+    func textFieldDidEndEditing(_ textField: UITextField) {
+        let value = textField.text.toInt()
+        if textField == minimumPriceTextField {
+            guard value <= maximumPriceTextField.text.toInt() else {
+                textField.text = "\(requestModel?.pmin ?? 0)"
+                let alert = UIAlertController(title: "", message: "minimum price should not exceed maximum price", preferredStyle: .alert)
+                alert.addAction(UIAlertAction(title: "Close", style: .default, handler: { (action) in
+                    alert.dismiss(animated: true, completion: nil)
+                }))
+                self.present(alert, animated: true, completion: nil)
+                return
+            }
+            requestModel?.pmin = value
+            doubleSlider.lowerValueStepIndex = value/step
+        }
+        if textField == maximumPriceTextField {
+            guard value >= minimumPriceTextField.text.toInt() else {
+                textField.text = "\(requestModel?.pmax ?? maxPrice)"
+                let alert = UIAlertController(title: "", message: "maximum price should not less than minimum price", preferredStyle: .alert)
+                alert.addAction(UIAlertAction(title: "Close", style: .default, handler: { (action) in
+                    alert.dismiss(animated: true, completion: nil)
+                }))
+                self.present(alert, animated: true, completion: nil)
+                return
+            }
+            requestModel?.pmax = value
+            doubleSlider.upperValueStepIndex = value/step
+        }
+    }
+    
+    func textFieldShouldReturn(_ textField: UITextField) -> Bool {
+        textField.resignFirstResponder()
+        return true
+    }
+}
+
+

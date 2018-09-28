@@ -22,7 +22,7 @@ class BaseFilterController: UIViewController {
         navigationItem.leftBarButtonItem = closeButton
         
         let resetButton = UIBarButtonItem(title: "Reset", style: .done, target: self, action: #selector(resetButtonTapped))
-        resetButton.tintColor = .green
+        resetButton.tintColor = .tokopediaGreen
         resetButton.setTitleTextAttributes([.font : UIFont.systemFont(ofSize: 14)], for: .normal)
         navigationItem.rightBarButtonItem = resetButton
     }

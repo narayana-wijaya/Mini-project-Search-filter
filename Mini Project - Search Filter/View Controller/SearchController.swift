@@ -22,14 +22,16 @@ class SearchController: UIViewController {
     
     var requestModel: RequestModel?
     
-    override func viewDidAppear(_ animated: Bool) {
-        super.viewDidAppear(animated)
-        requestModel = RequestModel(minPrice: 0, maxPrice: 1000000, wholesale: true, official: true, fshop: 2, start: startRow)
-        loadData(requestModel)
-    }
+//    override func viewDidAppear(_ animated: Bool) {
+//        super.viewDidAppear(animated)
+//
+//    }
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        requestModel = RequestModel(minPrice: 0, maxPrice: 100000000, wholesale: false, official: false, fshop: 1, start: 0)
+        loadData(requestModel)
+        
         collectionView.register(UINib(nibName: cellId, bundle: nil), forCellWithReuseIdentifier: cellId)
         
         if let flowLayout = collectionView.collectionViewLayout as? UICollectionViewFlowLayout {
@@ -38,6 +40,9 @@ class SearchController: UIViewController {
     }
     
     func loadData(_ model: RequestModel?) {
+        if let model = model, model.start == 0 {
+            self.items.removeAll()
+        }
         provider.getData(params: model.toKeyVal() ?? [:], { (newItems) in
             guard newItems.count > 0 else { return }
             
@@ -50,12 +55,18 @@ class SearchController: UIViewController {
     
     @IBAction func filterButtonDidTapped(_ sender: UIButton) {
         let vc = self.storyboard?.instantiateViewController(withIdentifier: "FilterController") as! FilterController
+        vc.delegate = self
         vc.requestModel = requestModel
         self.navigationController?.present(UINavigationController(rootViewController: vc), animated: true, completion: nil)
     }
 }
 
-
+extension SearchController: FilterDelegate {
+    func didUpdate(requestModel: RequestModel) {
+        self.requestModel = requestModel
+        loadData(requestModel)
+    }
+}
 
 extension SearchController: UICollectionViewDataSource {
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {

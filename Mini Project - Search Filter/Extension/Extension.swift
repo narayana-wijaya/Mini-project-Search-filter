@@ -51,3 +51,16 @@ extension UITextField {
                                                            views: views))
     }
 }
+
+extension UIColor {
+    static var tokopediaGreen: UIColor {
+        return UIColor(red: 66/255, green: 181/255, blue: 173/255, alpha: 1)
+    }
+}
+
+extension Optional where Wrapped == String {
+    func toInt() -> Int {
+        guard let string = self, let result = Int(string) else { return 0 }
+        return result
+    }
+}

@@ -26,6 +26,43 @@ class RequestModel: Encodable {
         self.fshop = fshop
         self.start = start
     }
+    
+    func reset(max: Int) {
+        self.pmin = 0
+        self.pmax = max
+        self.wholesale = false
+        self.official = false
+        self.fshop = 1
+        self.start = 0
+    }
+    
+    func resetBadge() {
+        self.official = false
+        self.fshop = 1
+    }
+    
+    var badgeList: [BadgeModel] {
+        var badge: [BadgeModel] = []
+        if let value = fshop {
+            let goldBadge = BadgeModel(title: BadgeType.goldMerchant.rawValue, show: value == 2 ? true : false)
+            badge.append(goldBadge)
+        }
+        if let official = official {
+            let officialBadge = BadgeModel(title: BadgeType.officialStore.rawValue, show: official)
+            badge.append(officialBadge)
+        }
+        return badge
+    }
+    
+    func setGoldMerchat(_ bool: Bool?) {
+        guard let bool = bool else { return }
+        self.fshop = bool ? 2 : 1
+    }
+}
+
+enum BadgeType: String {
+    case goldMerchant = "Gold Merchant"
+    case officialStore = "Official Store"
 }
 
 extension Encodable {

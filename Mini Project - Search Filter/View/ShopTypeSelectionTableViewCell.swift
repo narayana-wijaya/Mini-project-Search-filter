@@ -18,10 +18,14 @@ class ShopTypeSelectionTableViewCell: UITableViewCell {
         
     }
 
-    override func setSelected(_ selected: Bool, animated: Bool) {
-        super.setSelected(selected, animated: animated)
-
+    func setSelected(_ selected: Bool) {
         checkBoxImageView.image = selected ? UIImage(named: "box selected") : UIImage(named: "box unselected")
     }
+    
+//    override func setSelected(_ selected: Bool, animated: Bool) {
+//        super.setSelected(selected, animated: animated)
+//
+//        checkBoxImageView.image = selected ? UIImage(named: "box selected") : UIImage(named: "box unselected")
+//    }
     
 }
