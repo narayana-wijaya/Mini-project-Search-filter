@@ -47,6 +47,12 @@ class SearchController: UIViewController {
             debugPrint(errorMsg)
         }
     }
+    
+    @IBAction func filterButtonDidTapped(_ sender: UIButton) {
+        let vc = self.storyboard?.instantiateViewController(withIdentifier: "FilterController") as! FilterController
+        vc.requestModel = requestModel
+        self.navigationController?.present(UINavigationController(rootViewController: vc), animated: true, completion: nil)
+    }
 }
 
 
