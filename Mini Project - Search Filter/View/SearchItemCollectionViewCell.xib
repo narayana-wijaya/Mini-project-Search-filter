@@ -21,7 +21,7 @@
                     <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="thh-zE-VQN">
                         <rect key="frame" x="0.0" y="0.0" width="166" height="233"/>
                         <subviews>
-                            <imageView userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="upinipin" translatesAutoresizingMaskIntoConstraints="NO" id="Szl-SS-0U7">
+                            <imageView userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="Szl-SS-0U7">
                                 <rect key="frame" x="8" y="8" width="150" height="150"/>
                                 <constraints>
                                     <constraint firstAttribute="width" secondItem="Szl-SS-0U7" secondAttribute="height" multiplier="1:1" id="AFd-el-rOM"/>
@@ -80,7 +80,4 @@
             <point key="canvasLocation" x="230.40000000000001" y="236.13193403298354"/>
         </collectionViewCell>
     </objects>
-    <resources>
-        <image name="upinipin" width="266" height="266"/>
-    </resources>
 </document>

@@ -9,7 +9,7 @@
 import UIKit
 import Alamofire
 
-class NetworkDataProvider {
+struct NetworkDataProvider {
     func getData(params: [String: Any], _ completion: @escaping ([ItemModel]) -> Void, failure: @escaping (String) -> Void) {
         let baseUrl = "https://ace.tokopedia.com/search/v2.5/product"
         let request = Alamofire.request(URL(string: baseUrl)!, method: .get, parameters: params, encoding: URLEncoding.queryString, headers: nil)

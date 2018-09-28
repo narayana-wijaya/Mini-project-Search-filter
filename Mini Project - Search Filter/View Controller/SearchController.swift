@@ -85,11 +85,13 @@ extension SearchController: UICollectionViewDataSource {
 
 extension SearchController: UICollectionViewDelegate {
     func collectionView(_ collectionView: UICollectionView, willDisplay cell: UICollectionViewCell, forItemAt indexPath: IndexPath) {
-        guard let model = requestModel, indexPath.row%10 == 0 else {
+        guard let model = requestModel else {
             return
         }
-        model.start = items.count
-        loadData(model)
+        if indexPath.row == items.count - 1 && (indexPath.row+1)%10 == 0 {
+            model.start = items.count
+            loadData(model)
+        }
     }
 }
 
