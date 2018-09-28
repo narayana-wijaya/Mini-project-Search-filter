@@ -8,7 +8,7 @@
 
 import UIKit
 
-class RequestModel: Encodable {
+class RequestModel {
     let q: String = "samsung"
     var pmin: Int?
     var pmax: Int?
@@ -17,6 +17,19 @@ class RequestModel: Encodable {
     var fshop: Int?
     var start: Int?
     let rows: Int = 10
+    
+    required init(from decoder: Decoder) throws {}
+    
+    enum CodingKeys: String, CodingKey {
+        case q
+        case pmin
+        case pmax
+        case wholesale
+        case official
+        case fshop
+        case start
+        case rows
+    }
     
     init(minPrice: Int, maxPrice: Int, wholesale: Bool, official: Bool, fshop: Int, start: Int) {
         self.pmin = minPrice
@@ -57,6 +70,20 @@ class RequestModel: Encodable {
     func setGoldMerchat(_ bool: Bool?) {
         guard let bool = bool else { return }
         self.fshop = bool ? 2 : 1
+    }
+}
+
+extension RequestModel: Codable {
+    func encode(to encoder: Encoder) throws {
+        var container = encoder.container(keyedBy: CodingKeys.self)
+        try container.encode(q, forKey: .q)
+        try container.encode(pmin, forKey: .pmin)
+        try container.encode(pmax, forKey: .pmax)
+        try container.encode(wholesale.toString(), forKey: .wholesale)
+        try container.encode(official.toString(), forKey: .official)
+        try container.encode(fshop, forKey: .fshop)
+        try container.encode(start, forKey: .start)
+        try container.encode(rows, forKey: .rows)
     }
 }
 

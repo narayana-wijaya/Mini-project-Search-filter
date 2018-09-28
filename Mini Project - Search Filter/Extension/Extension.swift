@@ -79,3 +79,10 @@ extension BinaryInteger {
         return Formatter.withSeparator.string(for: self) ?? ""
     }
 }
+
+extension Optional where Wrapped == Bool {
+    func toString() -> String {
+        guard let bool = self else { return "false" }
+        return bool == true ? "true" : "false"
+    }
+}
